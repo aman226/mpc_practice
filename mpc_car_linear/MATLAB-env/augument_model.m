@@ -1,9 +1,6 @@
-function [A_ag,B_ag,C_ag,D_ag,X_ag,U_ag,N_states,N_controls] = augument_model(A_d,B_d,C_d,D_d,X,U,N_s,N_c)
+function [A_ag,B_ag,C_ag,D_ag,X_ag,U_ag,N_states,N_controls] = augument_model(A_d,B_d,C_d,D_d,X,U,N_s,N_c,U_k1,del_U)
     addpath('/casadi')
     import casadi.*
-
-    U_k1 = MX.sym('U_k1');
-    del_U = MX.sym('del_U');
     
     A_ag = [A_d B_d;zeros(N_c,N_s) eye(N_c) ];
     B_ag = [B_d;eye(N_c) ];
