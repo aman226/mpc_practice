@@ -11,9 +11,9 @@
 %   Simulation Parameters
 %--------------------------------------------------------------------------
     Ts = 0.02; % Timestep
-    N_horizon = 4; % Horizon for MPC
+    sim_time = 10; % Simulation Time
+    time = [1:Ts:sim_time + Ts];
 %--------------------------------------------------------------------------
- 
 
 
 %--------------------------------------------------------------------------
@@ -26,8 +26,17 @@
 N_controls = size(U,1);
 N_states = size(X,1);
 
+
+N_horizon = 4; % Horizon for MPC
+
 fprintf("No. of State Variables =  %d \n",N_states)
 fprintf("No. of Control Variables =  %d \n",N_controls)
+%--------------------------------------------------------------------------
+
+%--------------------------------------------------------------------------
+% Get Cost Matrix for the Cost Function
+%--------------------------------------------------------------------------
+[S,Q,R] = get_cost_matrix(N_controls);
 %--------------------------------------------------------------------------
 
 
@@ -74,15 +83,25 @@ y_aug = C_ag*X_ag + D_ag*U_ag;
 
 
 %--------------------------------------------------------------------------
-% Convert State Space Symbolic Form to Function
+% Get X for next N Steps - Horizon
+%--------------------------------------------------------------------------
+[A_horizon, B_horizon] = get_x_horizon(A_ag,B_ag,N_aug_states,N_aug_controls,N_horizon);
+
+U_horizon = MX.sym('d',N_horizon*N_aug_controls,1);
+state_horizon = MX.sym('x',N_aug_states,1);
+
+x_horizon = A_horizon*state_horizon + B_horizon*U_horizon;
+%--------------------------------------------------------------------------
+
+
+%--------------------------------------------------------------------------
+% Convert State Space/X_horizon Symbolic Form to Function
 %--------------------------------------------------------------------------
 x_aug_function = Function('AugumentedX',{X_ag,U_ag},{x_aug});
 y_aug_function = Function('AugumentedY',{X_ag,U_ag},{y_aug});
+x_horizon = Function('XHorizon',{state_horizon,U_horizon},{x_horizon});
 %--------------------------------------------------------------------------
 
-
-x_g = get_x_horizon(x_aug_function,[-0.01 0.02 -0.02 0.02],N_horizon,N_aug_states,[0 0 0 0 0]);
-plot(x_g(:,4),[0.4 0.8 1.2 1.6])
 
 
 %--------------------------------------------------------------------------
@@ -94,5 +113,4 @@ psi_dot = 0;
 Y = 0;
 delta = 0;
 %--------------------------------------------------------------------------
-
 
