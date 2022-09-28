@@ -12,7 +12,7 @@
 %--------------------------------------------------------------------------
     Ts = 0.02; % Timestep
     sim_time = 10; % Simulation Time
-    time = [1:Ts:sim_time + Ts];
+    time = 1:Ts:sim_time+Ts;
 %--------------------------------------------------------------------------
 
 
@@ -74,7 +74,7 @@ del_U = [del_delta]; % For future compatibility, I can add more controls here
 %--------------------------------------------------------------------------
 % Get the Augumented Matrix
 %--------------------------------------------------------------------------
-[A_ag,B_ag,C_ag,D_ag,X_ag,U_ag,N_aug_states,N_aug_controls] = augument_model(A_d,B_d,C_d,D_d,X,delta_k1,N_states,N_controls,U_k1,del_U);
+[A_ag,B_ag,C_ag,D_ag,X_ag,U_ag,N_aug_states,N_aug_controls] = augument_model(A_d,B_d,C_d,D_d,X,N_states,N_controls,U_k1,del_U);
 
 x_aug = A_ag*X_ag + B_ag*U_ag;
 y_aug = C_ag*X_ag + D_ag*U_ag;
@@ -99,8 +99,10 @@ x_horizon = A_horizon*state_horizon + B_horizon*U_horizon;
 %--------------------------------------------------------------------------
 x_aug_function = Function('AugumentedX',{X_ag,U_ag},{x_aug});
 y_aug_function = Function('AugumentedY',{X_ag,U_ag},{y_aug});
-x_horizon = Function('XHorizon',{state_horizon,U_horizon},{x_horizon});
+x_horizon_function = Function('XHorizon',{state_horizon,U_horizon},{x_horizon});
 %--------------------------------------------------------------------------
+
+generate_cost_function(C_ag,S,Q,R,N_horizon,N_aug_states,N_aug_controls,A_horizon, B_horizon);
 
 
 

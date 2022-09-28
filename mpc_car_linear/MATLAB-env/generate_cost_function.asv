@@ -1,4 +1,5 @@
-function [Q_db,T_db,R_db,H_db,F_db] = generate_cost_function(C_ag,S,Q,R,N_horizon,N_states,N_controls,A_horizon,B_horizon)
+function [Q_db,T_db,R_db] = generate_cost_function(C_ag,S,Q,R,N_horizon,N_states,N_controls,B_horizon)
+%C_db = B_horizon
     CQC = C_ag' *Q*C_ag;
     CSC = C_ag' *S*C_ag;
     QC = Q*C_ag;
@@ -19,9 +20,5 @@ function [Q_db,T_db,R_db,H_db,F_db] = generate_cost_function(C_ag,S,Q,R,N_horizo
             end
     end
     R_db = diag(ones(N_controls*N_horizon,1))*R;
-
-    H_db = B_horizon' * Q_db * B_horizon + R_db;
-    F_db_t = [A_horizon' *Q_db*B_horizon; -T_db*B_horizon];
-    F_db = F_db_t';
     
 end
