@@ -27,7 +27,7 @@ N_controls = size(U,1);
 N_states = size(X,1);
 
 
-N_horizon = 4; % Horizon for MPC
+N_horizon = 20; % Horizon for MPC
 
 fprintf("No. of State Variables =  %d \n",N_states)
 fprintf("No. of Control Variables =  %d \n",N_controls)
