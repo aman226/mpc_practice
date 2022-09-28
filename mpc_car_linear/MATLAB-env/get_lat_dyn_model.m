@@ -1,4 +1,4 @@
-function [A,B,C,D,X,U] = get_lat_dyn_model()
+function [A,B,C,D,X,U,x_dot] = get_lat_dyn_model()
     
     addpath('/casadi')
     import casadi.*

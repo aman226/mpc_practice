@@ -12,7 +12,7 @@
 %--------------------------------------------------------------------------
     Ts = 0.02; % Timestep
     sim_time = 10; % Simulation Time
-    time = 1:Ts:sim_time+Ts;
+    time = 0:Ts:sim_time;
 %--------------------------------------------------------------------------
 
 
@@ -20,14 +20,14 @@
 %   MODEL/PARAMS Lateral Dynamics for Vehicle
 %--------------------------------------------------------------------------
 % Get Dynamics Model
-[A,B,C,D,X,U] = get_lat_dyn_model(); % Edit Params in this function 
-
+[A,B,C,D,X,U,x_dot] = get_lat_dyn_model(); % Edit Params in this function 
+generate_ref_trajectory(time,x_dot)
 % Number of Control Variables and State Variables are
 N_controls = size(U,1);
 N_states = size(X,1);
 
 
-N_horizon = 20; % Horizon for MPC
+N_horizon = 4; % Horizon for MPC
 
 fprintf("No. of State Variables =  %d \n",N_states)
 fprintf("No. of Control Variables =  %d \n",N_controls)
@@ -102,8 +102,7 @@ y_aug_function = Function('AugumentedY',{X_ag,U_ag},{y_aug});
 x_horizon_function = Function('XHorizon',{state_horizon,U_horizon},{x_horizon});
 %--------------------------------------------------------------------------
 
-generate_cost_function(C_ag,S,Q,R,N_horizon,N_aug_states,N_aug_controls,A_horizon, B_horizon);
-
+get_optimized_input(C_ag,S,Q,R,N_horizon,N_aug_states,N_aug_controls,A_horizon, B_horizon);
 
 
 %--------------------------------------------------------------------------

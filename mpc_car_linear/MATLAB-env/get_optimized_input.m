@@ -1,4 +1,4 @@
-function [Q_db,T_db,R_db,H_db,F_db_t] = generate_cost_function(C_ag,S,Q,R,N_horizon,N_states,N_controls,A_horizon,B_horizon)
+function [Q_db,T_db,R_db,H_db,F_db_t] = get_optimized_input(C_ag,S,Q,R,N_horizon,N_states,N_controls,A_horizon,B_horizon)
     CQC = C_ag' *Q*C_ag;
     CSC = C_ag' *S*C_ag;
     QC = Q*C_ag;
@@ -21,7 +21,7 @@ function [Q_db,T_db,R_db,H_db,F_db_t] = generate_cost_function(C_ag,S,Q,R,N_hori
     R_db = diag(ones(N_controls*N_horizon,1))*R;
 
     H_db = B_horizon' * Q_db * B_horizon + R_db;
-    F_db_t = [A_horizon' *Q_db*B_horizon; -T_db*B_horizon];
-   -(inv(H_db))*F_db_t'; 
+    F_db_t = [A_horizon' * Q_db * B_horizon; -T_db*B_horizon];
+   -(inv(H_db))  * F_db_t';
     
 end
