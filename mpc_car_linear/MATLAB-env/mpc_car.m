@@ -1,3 +1,4 @@
+tic
 %--------------------------------------------------------------------------
 % Importing CaSADi
 %--------------------------------------------------------------------------
@@ -21,7 +22,6 @@
 %--------------------------------------------------------------------------
 % Get Dynamics Model
 [A,B,C,D,X,U,x_dot] = get_lat_dyn_model(); % Edit Params in this function 
-generate_ref_trajectory(time,x_dot)
 % Number of Control Variables and State Variables are
 N_controls = size(U,1);
 N_states = size(X,1);
@@ -32,6 +32,13 @@ N_horizon = 4; % Horizon for MPC
 fprintf("No. of State Variables =  %d \n",N_states)
 fprintf("No. of Control Variables =  %d \n",N_controls)
 %--------------------------------------------------------------------------
+
+%--------------------------------------------------------------------------
+% Get the ref_trajectory
+%--------------------------------------------------------------------------
+generate_ref_trajectory(time,x_dot)
+%--------------------------------------------------------------------------
+
 
 %--------------------------------------------------------------------------
 % Get Cost Matrix for the Cost Function
@@ -93,7 +100,6 @@ state_horizon = MX.sym('x',N_aug_states,1);
 x_horizon = A_horizon*state_horizon + B_horizon*U_horizon;
 %--------------------------------------------------------------------------
 
-
 %--------------------------------------------------------------------------
 % Convert State Space/X_horizon Symbolic Form to Function
 %--------------------------------------------------------------------------
@@ -102,8 +108,8 @@ y_aug_function = Function('AugumentedY',{X_ag,U_ag},{y_aug});
 x_horizon_function = Function('XHorizon',{state_horizon,U_horizon},{x_horizon});
 %--------------------------------------------------------------------------
 
-get_optimized_input(C_ag,S,Q,R,N_horizon,N_aug_states,N_aug_controls,A_horizon, B_horizon);
-
+[H_db,F_db_t] = get_optimized_input(C_ag,S,Q,R,N_horizon,N_aug_states,N_aug_controls,A_horizon, B_horizon);
+control_input = -(inv(H_db)) * F_db_t';
 
 %--------------------------------------------------------------------------
 % Initial Conditions
@@ -114,4 +120,4 @@ psi_dot = 0;
 Y = 0;
 delta = 0;
 %--------------------------------------------------------------------------
-
+toc
