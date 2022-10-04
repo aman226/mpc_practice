@@ -25,18 +25,22 @@ tic
 % Number of Control Variables and State Variables are
 N_controls = size(U,1);
 N_states = size(X,1);
+N_outputs = 2;
 
 
-N_horizon = 4; % Horizon for MPC
+N_horizon = 20; % Horizon for MPC
 
 fprintf("No. of State Variables =  %d \n",N_states)
 fprintf("No. of Control Variables =  %d \n",N_controls)
 %--------------------------------------------------------------------------
 
 %--------------------------------------------------------------------------
-% Get the ref_trajectory
+% Get the ref_trajectory and signal
 %--------------------------------------------------------------------------
-generate_ref_trajectory(time,x_dot)
+[psi_ref,x_ref,y_ref] = generate_ref_trajectory(time,x_dot);
+ref_signal = zeros(size(x_ref,2)*size(C,1),1);
+ref_signal(1:N_outputs:end) = psi_ref;
+ref_signal(2:N_outputs:end) = y_ref;
 %--------------------------------------------------------------------------
 
 
@@ -98,26 +102,65 @@ U_horizon = MX.sym('d',N_horizon*N_aug_controls,1);
 state_horizon = MX.sym('x',N_aug_states,1);
 
 x_horizon = A_horizon*state_horizon + B_horizon*U_horizon;
+% state_horizon = x_k
 %--------------------------------------------------------------------------
 
-%--------------------------------------------------------------------------
-% Convert State Space/X_horizon Symbolic Form to Function
-%--------------------------------------------------------------------------
-x_aug_function = Function('AugumentedX',{X_ag,U_ag},{x_aug});
-y_aug_function = Function('AugumentedY',{X_ag,U_ag},{y_aug});
-x_horizon_function = Function('XHorizon',{state_horizon,U_horizon},{x_horizon});
-%--------------------------------------------------------------------------
 
 [H_db,F_db_t] = get_optimized_input(C_ag,S,Q,R,N_horizon,N_aug_states,N_aug_controls,A_horizon, B_horizon);
-control_input = -(inv(H_db)) * F_db_t';
 
 %--------------------------------------------------------------------------
 % Initial Conditions
 %--------------------------------------------------------------------------
 y_dot = 0;
-psi = 0;
+psi = 0.5;
 psi_dot = 0;
-Y = 0;
+Y = y_ref(1)+3;
+current_state = [y_dot;psi;psi_dot;Y];
 delta = 0;
 %--------------------------------------------------------------------------
+
+y_act = zeros(size(time,2),1);
+k = 1;
+N_horizon_temp = N_horizon;
+for i=1:size(time,2)-1
+    
+    x_aug_0 = [current_state;delta]; 
+    y_act(i) = x_aug_0(4);
+    
+    if k+N_outputs*N_horizon_temp<=size(ref_signal,1)
+        r = ref_signal(k:k+N_outputs*N_horizon_temp-1);
+    else
+        r = ref_signal(k:size(ref_signal,1)-2);
+        N_horizon_temp=N_horizon_temp-1;
+    end
+    k = k + N_outputs;
+
+    if N_horizon_temp < N_horizon
+        [A_horizon, B_horizon] = get_x_horizon(A_ag,B_ag,N_aug_states,N_aug_controls,N_horizon_temp);
+        [H_db,F_db_t] = get_optimized_input(C_ag,S,Q,R,N_horizon_temp,N_aug_states,N_aug_controls,A_horizon, B_horizon);
+    end
+
+    
+    control_input = -(inv(H_db)) * F_db_t' * [x_aug_0;r];
+    delta = delta + control_input(1);
+
+    if delta < -pi/6
+        delta = -pi/6;
+    end
+
+    if delta > pi/6
+        delta = pi/6;
+    end
+    
+    current_state = next_state_calculate(current_state,delta,Ts);
+end
 toc
+
+close all
+hold on
+plot(x_ref,y_act,'--','LineWidth',2)
+
+plot(x_ref,y_ref)
+legend('Followed Trajectory','Actual Trajectory')
+
+hold off

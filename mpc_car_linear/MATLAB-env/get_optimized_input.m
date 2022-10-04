@@ -19,7 +19,6 @@ function [H_db,F_db_t] = get_optimized_input(C_ag,S,Q,R,N_horizon,N_states,N_con
             end
     end
     R_db = diag(ones(N_controls*N_horizon,1))*R;
-
     H_db = B_horizon' * Q_db * B_horizon + R_db;
     F_db_t = [A_horizon' * Q_db * B_horizon; -T_db*B_horizon];
    

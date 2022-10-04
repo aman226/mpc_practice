@@ -21,7 +21,5 @@ function [psiInt,x,y] = generate_ref_trajectory(t,x_dot)
         else
             psiInt(i+1)=psiInt(i)+dpsi(i);
         end
-     end
-
-     plot(x,psiInt)   
+     end 
 end
