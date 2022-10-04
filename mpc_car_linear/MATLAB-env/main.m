@@ -112,7 +112,7 @@ x_horizon = A_horizon*state_horizon + B_horizon*U_horizon;
 % Initial Conditions
 %--------------------------------------------------------------------------
 y_dot = 0;
-psi = 0.5;
+psi = -0.2;
 psi_dot = 0;
 Y = y_ref(1)+3;
 current_state = [y_dot;psi;psi_dot;Y];
@@ -120,26 +120,26 @@ delta = 0;
 %--------------------------------------------------------------------------
 
 y_act = zeros(size(time,2),1);
-k = 1;
+k = 0;
 N_horizon_temp = N_horizon;
 for i=1:size(time,2)-1
     
+
     x_aug_0 = [current_state;delta]; 
-    y_act(i) = x_aug_0(4);
+   
     
-    if k+N_outputs*N_horizon_temp<=size(ref_signal,1)
-        r = ref_signal(k:k+N_outputs*N_horizon_temp-1);
+    k = k + N_outputs;
+    if k+N_outputs*N_horizon_temp<=(size(ref_signal,1))
+        r = ref_signal(k+1:k+N_outputs*N_horizon_temp);
     else
-        r = ref_signal(k:size(ref_signal,1)-2);
+        r = ref_signal(k+1:size(ref_signal,1));
         N_horizon_temp=N_horizon_temp-1;
     end
-    k = k + N_outputs;
 
-    if N_horizon_temp < N_horizon
+    if N_horizon_temp<N_horizon
         [A_horizon, B_horizon] = get_x_horizon(A_ag,B_ag,N_aug_states,N_aug_controls,N_horizon_temp);
         [H_db,F_db_t] = get_optimized_input(C_ag,S,Q,R,N_horizon_temp,N_aug_states,N_aug_controls,A_horizon, B_horizon);
     end
-
     
     control_input = -(inv(H_db)) * F_db_t' * [x_aug_0;r];
     delta = delta + control_input(1);
@@ -151,11 +151,11 @@ for i=1:size(time,2)-1
     if delta > pi/6
         delta = pi/6;
     end
-    
+    y_act(i) = x_aug_0(4);
     current_state = next_state_calculate(current_state,delta,Ts);
 end
+y_act(size(time,2)) = y_act(size(time,2)-1);
 toc
-
 close all
 hold on
 plot(x_ref,y_act,'--','LineWidth',2)
