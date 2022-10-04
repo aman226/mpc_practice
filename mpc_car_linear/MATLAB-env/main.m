@@ -1,11 +1,9 @@
-tic
 %--------------------------------------------------------------------------
 % Importing CaSADi
 %--------------------------------------------------------------------------
     addpath('/casadi')
     import casadi.*
 %--------------------------------------------------------------------------
-
 
 
 %--------------------------------------------------------------------------
@@ -111,17 +109,21 @@ x_horizon = A_horizon*state_horizon + B_horizon*U_horizon;
 %--------------------------------------------------------------------------
 % Initial Conditions
 %--------------------------------------------------------------------------
-y_dot = 0;
-psi = -0.2;
+y_dot = 0.5;
+psi = 0.2;
 psi_dot = 0;
-Y = y_ref(1)+3;
+Y = y_ref(1)+2;
 current_state = [y_dot;psi;psi_dot;Y];
 delta = 0;
 %--------------------------------------------------------------------------
 
+
+
+
 y_act = zeros(size(time,2),1);
 k = 0;
 N_horizon_temp = N_horizon;
+
 for i=1:size(time,2)-1
     
 
@@ -155,12 +157,13 @@ for i=1:size(time,2)-1
     current_state = next_state_calculate(current_state,delta,Ts);
 end
 y_act(size(time,2)) = y_act(size(time,2)-1);
-toc
+
+
 close all
-hold on
-plot(x_ref,y_act,'--','LineWidth',2)
+plot(x_ref,y_ref) 
+h = animatedline('Color','r','LineWidth',3);
 
-plot(x_ref,y_ref)
-legend('Followed Trajectory','Actual Trajectory')
-
-hold off
+for l=1:size(time,2)
+    addpoints(h,x_ref(l),y_act(l))
+    pause(0.02)
+end

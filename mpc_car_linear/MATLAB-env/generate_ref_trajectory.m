@@ -1,5 +1,5 @@
 function [psiInt,x,y] = generate_ref_trajectory(t,x_dot)
-     y=9*tanh(t-t(size(t,2))/2);
+     y=3*tanh(t-t(size(t,2))/2);
      for i=1:size(t,2)
          x(i) = x_dot*t(i);
      end
