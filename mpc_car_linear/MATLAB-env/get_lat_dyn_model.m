@@ -10,7 +10,7 @@ function [A,B,C,D,X,U,x_dot] = get_lat_dyn_model()
     Car = 33000;
     lf = 2;
     lr = 3;
-    x_dot = 20;
+    x_dot = 25;
     %---------------------------------------
 
     A1 = -(2*Caf+2*Car)/(m*x_dot);

@@ -109,12 +109,14 @@ x_horizon = A_horizon*state_horizon + B_horizon*U_horizon;
 %--------------------------------------------------------------------------
 % Initial Conditions
 %--------------------------------------------------------------------------
-y_dot = 0.5;
-psi = 0.2;
+y_dot = 0;
+psi = 0;
 psi_dot = 0;
-Y = y_ref(1)+2;
-current_state = [y_dot;psi;psi_dot;Y];
+Y = y_ref(1) +2;
 delta = 0;
+
+current_state = [y_dot;psi;psi_dot;Y];
+
 %--------------------------------------------------------------------------
 
 

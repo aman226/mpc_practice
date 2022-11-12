@@ -5,7 +5,7 @@ function next_state = next_state_calculate(current_state,delta,Ts)
     Car = 33000;
     lf = 2;
     lr = 3;
-    x_dot = 20;
+    x_dot = 25;
 
     y_dot=current_state(1);
     psi=current_state(2);
