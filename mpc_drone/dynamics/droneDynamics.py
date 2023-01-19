@@ -1,7 +1,7 @@
 import numpy as np
 
 class droneDynamics:
-    def __init__(self, mass = 1, g = 9.81 , I_x = 0.1 , I_y = 0.1 , I_z = 0.1 ):
+    def __init__(self, mass = 1, g = 9.81 , I_x = 1 , I_y = 1 , I_z = 1 ):
         self.mass = mass
         self.I_x = I_x
         self.I_y = I_y
