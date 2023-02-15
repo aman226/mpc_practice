@@ -1,6 +1,6 @@
-from numpy import sqrt,cos,pi
+from numpy import sqrt,cos,pi,clip,Infinity
 class PID:
-    def __init__(self, k_p, k_i, k_d, max = float("inf"), min = - float("inf"), fc = 0) -> None:
+    def __init__(self, k_p, k_i, k_d, max = Infinity, min = - Infinity, fc = 0) -> None:
         self.k_p = k_p 
         self.k_i = k_i
         self.k_d = k_d
@@ -24,6 +24,7 @@ class PID:
 
         control_out = self.k_p * error + self.k_i * self.integral + self.k_d * self.derivative
 
+
         if max != float("inf"):
             if control_out > self.max:
                 control_out = self.max
@@ -43,6 +44,10 @@ class PID:
         # α(fₙ) = cos(2πfₙ) - 1 + √( cos(2πfₙ)² - 4 cos(2πfₙ) + 3 )
         c = cos(2 * pi * fn)
         return c - 1 + sqrt(c * c - 4 * c + 3)
+    
+    def antiWindupClamp(self, control_out, control_outClamped, error):
+        pass
+        
     
     def reset(self):
         self.prevError = 0
